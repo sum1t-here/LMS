@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser';
 import { config } from 'dotenv';
 config();
 import morgan from 'morgan';
+import userRoutes from './routes/user.routes.js';
 
 const app = express();
 
@@ -24,8 +25,10 @@ app.use('/ping', function (req, res) {
   res.send('/pong');
 });
 
+app.use('/api/v1/user', userRoutes);
+
 app.all('*', (req, res) => {
-  res.status(404).send('OOPS! route not find');
+  res.status(404).send('OOPS!! 404 route not find');
 });
 
 export default app;
