@@ -3,6 +3,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { config } from 'dotenv';
 config();
+import morgan from 'morgan';
 
 const app = express();
 
@@ -16,6 +17,8 @@ app.use(
 );
 
 app.use(cookieParser());
+
+app.use(morgan('dev'));
 
 app.use('/ping', function (req, res) {
   res.send('/pong');
