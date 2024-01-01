@@ -5,6 +5,7 @@ import { config } from 'dotenv';
 config();
 import morgan from 'morgan';
 import userRoutes from './routes/user.routes.js';
+import errorMiddleware from './middlewares/errorMiddleware.js';
 
 const app = express();
 
@@ -30,5 +31,7 @@ app.use('/api/v1/user', userRoutes);
 app.all('*', (req, res) => {
   res.status(404).send('OOPS!! 404 route not find');
 });
+
+app.use(errorMiddleware);
 
 export default app;
