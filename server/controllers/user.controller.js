@@ -51,10 +51,63 @@ const register = async (req, res) => {
   });
 };
 
-const login = (req, res) => {};
+const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
 
-const logout = (req, res) => {};
+    if (!email || !password) {
+      return next(new AppError('All fields are required', 400));
+    }
 
-const getProfile = (req, res) => {};
+    const user = await User.findOne({
+      email,
+    }).select('+password'); // explicitly calling password
+
+    if (!user || !user.comparePassword(password)) {
+      return next(new AppError('Email or password doesnot match', 400));
+    }
+
+    const token = await user.generateJWTToken();
+    user.password = undefined;
+
+    res.cookie('token', token, cookieOptions);
+
+    res.status(200).json({
+      success: true,
+      message: 'User logged in successfully',
+      user,
+    });
+  } catch (err) {
+    return next(new AppError(e.message, 500));
+  }
+};
+
+const logout = (req, res) => {
+  res.cookie('token', null, {
+    secure: true,
+    maxAge: 0,
+    httpOnly: true,
+  });
+
+  res.status(200).json({
+    success: true,
+    message: 'User logged out successfully',
+  });
+};
+
+const getProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const user = await User.findById(userId);
+
+    res.status(200).json({
+      success: true,
+      message: 'User details',
+      user,
+    });
+  } catch (err) {
+    return next(new AppError('Failed to fetch profile', 501));
+  }
+};
 
 export { register, login, logout, getProfile };
